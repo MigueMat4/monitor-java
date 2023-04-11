@@ -42,8 +42,8 @@
                               <Component id="btnConsumidor" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="spnVelocidad" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="spnVelocidad" min="-2" pref="129" max="-2" attributes="0"/>
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -54,7 +54,7 @@
           <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" pref="106" max="-2" attributes="0"/>
-                  <Component id="lblValor1" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblValor" min="-2" max="-2" attributes="0"/>
                   <EmptySpace pref="273" max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -84,7 +84,7 @@
           <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" pref="113" max="-2" attributes="0"/>
-                  <Component id="lblValor1" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblValor" min="-2" max="-2" attributes="0"/>
                   <EmptySpace pref="165" max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -108,7 +108,7 @@
         <Property name="text" type="java.lang.String" value="?"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblValor1">
+    <Component class="javax.swing.JLabel" name="lblValor">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="36" style="1"/>
@@ -120,16 +120,22 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Iniciar productores"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnProductoresActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnConsumidor">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Iniciar productores"/>
+        <Property name="text" type="java.lang.String" value="Iniciar consumidor"/>
         <Property name="actionCommand" type="java.lang.String" value="Iniciar consumidor"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnConsumidorActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Velocidad:"/>
+        <Property name="text" type="java.lang.String" value="Velocidad productores:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JSpinner" name="spnVelocidad">

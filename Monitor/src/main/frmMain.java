@@ -4,17 +4,116 @@
  */
 package main;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+
 /**
  *
- * @author mfmatul
+ * @author Miguel Matul
  */
 public class frmMain extends javax.swing.JFrame {
+    
+    Monitor mi_monitor = new Monitor();
 
     /**
      * Creates new form frmMain
      */
     public frmMain() {
         initComponents();
+        spnVelocidad.setModel(new SpinnerNumberModel(10, 10, 1000, 10));
+        spnVelocidad.setEditor(new JSpinner.DefaultEditor(spnVelocidad));
+    }
+    
+    public class Monitor {
+        // Región crítica
+        private int valor;
+        private String letra;
+        
+        public Monitor() {
+            valor = 0;
+            letra = "";
+        }
+        
+        public synchronized void aumentar(String idProductor) {
+            if (valor == 50) {
+                try {
+                    System.out.println(idProductor + " me voy a dormir");
+                    wait();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(frmMain.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                System.out.println(idProductor + " me desperté");
+            }
+            valor += 1;
+            lblValor.setText(String.valueOf(valor));
+            System.out.println(idProductor + " incrementé valor a " + valor);
+            letra = idProductor;
+            lblLetra.setText(letra);
+            try {
+                int velocidad = (Integer) spnVelocidad.getValue();
+                Thread.sleep(velocidad);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(frmMain.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (valor >= 10) {
+                notify();
+            }
+        }
+        
+        public synchronized void decrementar(String idConsumidor) {
+            if (valor < 10) {
+                try {
+                    System.out.println(idConsumidor + " me voy a dormir");
+                    wait();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(frmMain.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                System.out.println(idConsumidor + " me desperté");
+            }
+            valor -= 10;
+            lblValor.setText(String.valueOf(valor));
+            System.out.println(idConsumidor + " decrementé valor a " + valor);
+            letra = idConsumidor;
+            lblLetra.setText(letra);
+            if (valor < 50) {
+                notify();
+            }
+        }
+    }
+    
+    public class Productor extends Thread {
+        public String idProductor;
+
+        public Productor(String idProductor) {
+            this.idProductor = idProductor;
+        }
+        
+        @Override
+        public void run() {
+            while (true) {
+                System.out.println(idProductor + " listo para aumentar valor");
+                mi_monitor.aumentar(idProductor);
+                System.out.println(idProductor + " logró su cometido");
+            }
+        }
+    }
+    
+    public class Consumidor extends Thread {
+        public String idConsumidor = "-";
+
+        public Consumidor() {
+        }
+        
+        @Override
+        public void run() {
+            while (true) {
+                System.out.println(idConsumidor + " listo para decrementar valor");
+                mi_monitor.decrementar(idConsumidor);
+                System.out.println(idConsumidor + " logró su cometido");
+            }
+        }
     }
 
     /**
@@ -28,7 +127,7 @@ public class frmMain extends javax.swing.JFrame {
 
         jLabel1 = new javax.swing.JLabel();
         lblLetra = new javax.swing.JLabel();
-        lblValor1 = new javax.swing.JLabel();
+        lblValor = new javax.swing.JLabel();
         btnProductores = new javax.swing.JButton();
         btnConsumidor = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
@@ -43,15 +142,25 @@ public class frmMain extends javax.swing.JFrame {
         lblLetra.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         lblLetra.setText("?");
 
-        lblValor1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
-        lblValor1.setText("0");
+        lblValor.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        lblValor.setText("0");
 
         btnProductores.setText("Iniciar productores");
+        btnProductores.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnProductoresActionPerformed(evt);
+            }
+        });
 
-        btnConsumidor.setText("Iniciar productores");
+        btnConsumidor.setText("Iniciar consumidor");
         btnConsumidor.setActionCommand("Iniciar consumidor");
+        btnConsumidor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConsumidorActionPerformed(evt);
+            }
+        });
 
-        jLabel2.setText("Velocidad:");
+        jLabel2.setText("Velocidad productores:");
 
         jLabel3.setText("milisegundos");
 
@@ -75,14 +184,14 @@ public class frmMain extends javax.swing.JFrame {
                                 .addGap(45, 45, 45)
                                 .addComponent(btnConsumidor))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(spnVelocidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(spnVelocidad, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
                                 .addComponent(jLabel3)))))
                 .addContainerGap(45, Short.MAX_VALUE))
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addGap(106, 106, 106)
-                    .addComponent(lblValor1)
+                    .addComponent(lblValor)
                     .addContainerGap(273, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
@@ -106,12 +215,30 @@ public class frmMain extends javax.swing.JFrame {
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addGap(113, 113, 113)
-                    .addComponent(lblValor1)
+                    .addComponent(lblValor)
                     .addContainerGap(165, Short.MAX_VALUE)))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnProductoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProductoresActionPerformed
+        // TODO add your handling code here:
+        Productor p1 = new Productor("A");
+        Productor p2 = new Productor("B");
+        Productor p3 = new Productor("C");
+        Productor p4 = new Productor("D");
+        p1.start();
+        p2.start();
+        p3.start();
+        p4.start();
+    }//GEN-LAST:event_btnProductoresActionPerformed
+
+    private void btnConsumidorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsumidorActionPerformed
+        // TODO add your handling code here:
+        Consumidor c1 = new Consumidor();
+        c1.start();
+    }//GEN-LAST:event_btnConsumidorActionPerformed
 
     /**
      * @param args the command line arguments
@@ -155,7 +282,7 @@ public class frmMain extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel lblLetra;
-    private javax.swing.JLabel lblValor1;
+    private javax.swing.JLabel lblValor;
     private javax.swing.JSpinner spnVelocidad;
     // End of variables declaration//GEN-END:variables
 }
