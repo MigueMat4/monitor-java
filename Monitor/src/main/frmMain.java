@@ -15,7 +15,9 @@ import javax.swing.SpinnerNumberModel;
  */
 public class frmMain extends javax.swing.JFrame {
     
-    Monitor mi_monitor = new Monitor();
+    // Región crítica
+    private int valor = 0;
+    private String letra = "";
 
     /**
      * Creates new form frmMain
@@ -24,63 +26,6 @@ public class frmMain extends javax.swing.JFrame {
         initComponents();
         spnVelocidad.setModel(new SpinnerNumberModel(10, 10, 1000, 10));
         spnVelocidad.setEditor(new JSpinner.DefaultEditor(spnVelocidad));
-    }
-    
-    public class Monitor {
-        // Región crítica
-        private int valor;
-        private String letra;
-        
-        public Monitor() {
-            valor = 0;
-            letra = "";
-        }
-        
-        public synchronized void aumentar(String idProductor) {
-            if (valor == 50) {
-                try {
-                    System.out.println(idProductor + " me voy a dormir");
-                    wait();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(frmMain.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                System.out.println(idProductor + " me desperté");
-            }
-            valor += 1;
-            lblValor.setText(String.valueOf(valor));
-            System.out.println(idProductor + " incrementé valor a " + valor);
-            letra = idProductor;
-            lblLetra.setText(letra);
-            try {
-                int velocidad = (Integer) spnVelocidad.getValue();
-                Thread.sleep(velocidad);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(frmMain.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            if (valor >= 10) {
-                notify();
-            }
-        }
-        
-        public synchronized void decrementar(String idConsumidor) {
-            if (valor < 10) {
-                try {
-                    System.out.println(idConsumidor + " me voy a dormir");
-                    wait();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(frmMain.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                System.out.println(idConsumidor + " me desperté");
-            }
-            valor -= 10;
-            lblValor.setText(String.valueOf(valor));
-            System.out.println(idConsumidor + " decrementé valor a " + valor);
-            letra = idConsumidor;
-            lblLetra.setText(letra);
-            if (valor < 50) {
-                notify();
-            }
-        }
     }
     
     public class Productor extends Thread {
@@ -94,7 +39,21 @@ public class frmMain extends javax.swing.JFrame {
         public void run() {
             while (true) {
                 System.out.println(idProductor + " listo para aumentar valor");
-                mi_monitor.aumentar(idProductor);
+                //
+                if (valor <= 50) {
+                    valor += 1;
+                    lblValor.setText(String.valueOf(valor));
+                    System.out.println(idProductor + " incrementé valor a " + valor);
+                    letra = idProductor;
+                    lblLetra.setText(letra);
+                    try {
+                        int velocidad = (Integer) spnVelocidad.getValue();
+                        Thread.sleep(velocidad);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(frmMain.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                //
                 System.out.println(idProductor + " logró su cometido");
             }
         }
@@ -110,7 +69,15 @@ public class frmMain extends javax.swing.JFrame {
         public void run() {
             while (true) {
                 System.out.println(idConsumidor + " listo para decrementar valor");
-                mi_monitor.decrementar(idConsumidor);
+                //
+                if (valor >= 10) {
+                    valor -= 10;
+                    lblValor.setText(String.valueOf(valor));
+                    System.out.println(idConsumidor + " decrementé valor a " + valor);
+                    letra = idConsumidor;
+                    lblLetra.setText(letra);
+                }
+                //
                 System.out.println(idConsumidor + " logró su cometido");
             }
         }
